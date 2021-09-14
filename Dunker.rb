@@ -1,8 +1,7 @@
 #!/usr/bin/ruby
 require 'ruby2d'
-set title: "Dunken"
+set title: "Dunker"
 set height: 800
-set background: 'white'
 fundo = Image.new(
   './img/fundo.png',
   x: 0,
@@ -10,31 +9,34 @@ fundo = Image.new(
   z: 0
 )
  
-alvo = Circle.new(
-  x: 450, y: 250,
-  radius: 15,
-  sectors: 32,
-  color: 'fuchsia',
-  z: 10,
-  
-)
-x_vel = 0
-y_vel = 0
-update do
- if (x_vel < 10 && y_vel == 0) then
-  x_vel += 1 
-  alvo.x += x_vel
-  alvo.y += y_vel
- elsif (y_vel < 10 && x_vel == 10) then
-  y_vel += 1
-  alvo.y += y_vel
- elsif (y_vel == 10 && x_vel > 0) then
-  x_vel -= 1
-  alvo.x -= (10 - x_vel)
- else
-  y_vel -= 1
-  alvo.y -= (10 - y_vel)
- end 
+$alvo = Circle.new(
+   x: 450, y: 250, z: 10,
+   radius: 15,
+   #sectors: 32,
+   color: 'fuchsia'
+   )
+   
+def mexe_alvo
+  $alvo.x = 450
+  $alvo.y = 250
+  x_vel = 0
+  y_vel = 0
+  update do
+   if (x_vel < 10 && y_vel == 0) then
+    x_vel += 1 
+    $alvo.x += x_vel
+    $alvo.y += y_vel
+   elsif (y_vel < 10 && x_vel == 10) then
+    y_vel += 1
+    $alvo.y += y_vel
+   elsif (y_vel == 10 && x_vel > 0) then
+    x_vel -= 1
+    $alvo.x -= (10 - x_vel)
+   else
+    y_vel -= 1
+    $alvo.y -= (10 - y_vel)
+   end 
+  end
 end
 a = Sprite.new(
   './img/sprite_2.png',
@@ -65,10 +67,11 @@ balde = Sprite.new(
 )
 balde.play
 on :mouse_down do |event|
-  if alvo.contains?(event.x, event.y) then
+  if $alvo.contains?(event.x, event.y) then
     a.remove
     balde.remove
     plataforma.remove
+    $alvo.remove
     a_agua = Sprite.new(
      './img/sprite_3.png',
       x: 100, 
@@ -98,9 +101,39 @@ on :mouse_down do |event|
           loop: true
           )
           a_boiando.play
-          $boiando = true          
+          $boiando = true 
+          btn_jogar = Rectangle.new(
+          x: 428,
+          y: 100,
+          z: 5,
+          width: 200,
+          height: 50,
+          color: 'green'
+          )
+          txt_jogar = Text.new(
+          'Jogar Novamente',
+          x: 433,
+          y: 113,
+          z: 6,
+          size: 20,
+          style: 'bold',
+          color: 'white'         
+          )
+          on :mouse_down do |event1|
+              if btn_jogar.contains?(event1.x, event1.y) then
+                a_boiando.remove
+                balde.add
+                a.add
+                plataforma.add
+                btn_jogar.remove
+                txt_jogar.remove
+                $alvo.add
+                mexe_alvo
+              end
+           end 
       end
    end
   end
 end
+mexe_alvo
 show
